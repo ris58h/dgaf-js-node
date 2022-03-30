@@ -7,7 +7,7 @@ describe('transpile', () => {
         assert.equal(transpile('x.a.b.c'), 'x?.a?.b?.c')
         assert.equal(transpile('x.a().b?.c'), 'x?.a()?.b?.c')
     })
-    it ('Should preserve indentation', () => {
+    it('Should preserve indentation', () => {
         const input = `if (x.a) {
             console.log(x.a)
         }`
@@ -15,5 +15,9 @@ describe('transpile', () => {
             console?.log(x?.a)
         }`
         assert.equal(transpile(input), expectedOutput)
+    })
+    it.only("Shouldn't replace dots in left-side of assignment", () => {
+        assert.equal(transpile('x.a = y'), 'x.a = y')
+        assert.equal(transpile('x.a = y.b'), 'x.a = y?.b')
     })
 })

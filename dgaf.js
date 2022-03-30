@@ -6,10 +6,11 @@ export function transpile(text) {
     parser.setLanguage(JavaScript)
 
     const tree = parser.parse(text)
+    // printNode(tree.rootNode) //TODO
 
     const dotIndexes = []
     walkTree(tree, node => {
-        if (node.type === '.' && node?.parent.type === 'member_expression') {
+        if (isDotNode(node)) {
             dotIndexes.push(node.startIndex)
         }
     })
@@ -17,6 +18,12 @@ export function transpile(text) {
     dotIndexes.sort((a, b) => a - b)
 
     return replaceDots(text, dotIndexes)
+}
+
+function isDotNode(node) {
+    return node.type === '.'
+        && node.parent?.type === 'member_expression'
+        && !(node.parent.parent?.type === 'assignment_expression' && node.parent.nextSibling?.type === '=')
 }
 
 function replaceDots(text, sortedDotIndexes) {
@@ -55,3 +62,23 @@ function walkTree(tree, callback) {
         }
     }
 }
+
+//TODO
+// function printNode(node, lvl = 0) {
+//     const prefix = '-'.repeat(lvl)
+//     console.log(prefix + describeNode(node))
+//     if (node.children) {
+//         for (let childNode of node.children) {
+//             printNode(childNode, lvl + 1)
+//         }
+//     }
+
+//     function describeNode(node) {
+//         var sb = ''
+//         if (node.hasError()) sb += 'E~'
+//         if (node.isMissing()) sb += 'M~'
+//         sb += node.type
+//         if (node.isNamed) sb += ': ' + node.text
+//         return sb
+//     }
+// }
