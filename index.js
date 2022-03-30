@@ -18,7 +18,7 @@ function transpileText(text) {
     const tree = parser.parse(text)
     const dotIndexes = []
     walkTree(tree, node => {
-        if (!node.isNamed && node.type === '.') {
+        if (node.type === '.' && node?.parent.type === 'member_expression') {
             dotIndexes.push(node.startIndex)
         }
     })
