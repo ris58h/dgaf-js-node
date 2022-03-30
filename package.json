@@ -2,6 +2,14 @@
   "name": "dgaf-js",
   "version": "1.0.0",
   "description": "JS that DGAF",
+  "keywords": ["DGAF"],
+  "homepage": "https://github.com/ris58h/dgaf-js-node",
+  "author": "Ilya Rodionov",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ris58h/dgaf-js-node.git"
+  },
   "scripts": {
     "test": "mocha"
   },
