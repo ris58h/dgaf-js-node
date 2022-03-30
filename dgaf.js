@@ -1,7 +1,7 @@
-import Parser from 'tree-sitter'
-import JavaScript from 'tree-sitter-javascript'
+const Parser = require('tree-sitter')
+const JavaScript = require('tree-sitter-javascript')
 
-export function transpile(text) {
+exports.transpile = function(text) {
     const parser = new Parser()
     parser.setLanguage(JavaScript)
 

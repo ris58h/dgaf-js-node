@@ -1,5 +1,5 @@
-import { transpile } from '../dgaf.js';
-import { strict as assert } from 'assert';
+const transpile = require('../dgaf').transpile
+const assert = require('assert').strict
 
 describe('transpile', () => {
     it('Should replace member access', () => {
