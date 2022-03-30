@@ -1,33 +1,20 @@
-const Parser = require('tree-sitter')
-const JavaScript = require('tree-sitter-javascript')
+import Parser from 'tree-sitter'
+import JavaScript from 'tree-sitter-javascript'
 
-const parser = new Parser()
-parser.setLanguage(JavaScript)
-
-const sourceCode = 'x.a.b?.c\nconsole.log("asd")'
-// const sourceCode = 'x.a.b?.c\nreturn\nfunction(){return}()\n{console.log("sd")'
-// const tree = parser.parse(sourceCode)
-// printTree(tree.rootNode)
-// walkTree(tree, printNode)
-
-const dgafText = transpileText(sourceCode)
-console.log('RESULT:')
-console.log(dgafText)
-
-function transpileText(text) {
+export function transpileText(text) {
+    const parser = new Parser()
+    parser.setLanguage(JavaScript)
+    
     const tree = parser.parse(text)
+    
     const dotIndexes = []
     walkTree(tree, node => {
         if (node.type === '.' && node?.parent.type === 'member_expression') {
             dotIndexes.push(node.startIndex)
         }
     })
+    
     dotIndexes.sort((a, b) => a - b)
-
-    //TODO
-    printTree(tree.rootNode)
-    console.log(dotIndexes)
-    // walkTree(tree, printNode)
 
     return replaceDots(text, dotIndexes)
 }
