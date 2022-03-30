@@ -9,9 +9,12 @@
   "license": "ISC",
   "author": "Ilya Rodionov",
   "files": [
-    "/index.js"
+    "dgaf.js",
+    "index.js"
   ],
-  "main": "index.js",
+  "bin": {
+    "dgaf-js": "index.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ris58h/dgaf-js-node.git"
