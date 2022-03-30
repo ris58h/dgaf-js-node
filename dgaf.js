@@ -8,16 +8,30 @@ export function transpile(text) {
     const tree = parser.parse(text)
     // printNode(tree.rootNode) //TODO
 
-    const dotIndexes = []
+    const positionsToInsert = []
     walkTree(tree, node => {
         if (isDotNode(node)) {
-            dotIndexes.push(node.startIndex)
+            positionsToInsert.push({
+                from: node.startIndex,
+                to: node.endIndex
+            })
+        } else if (isCallArgumentsNode(node)) {
+            const argumentsIndex = node.startIndex
+            positionsToInsert.push({
+                from: argumentsIndex,
+                to: argumentsIndex
+            })
         }
     })
 
-    dotIndexes.sort((a, b) => a - b)
+    positionsToInsert.sort((a, b) => a.startIndex - b.startIndex)
 
-    return replaceDots(text, dotIndexes)
+    return insertOptionalChaining(text, positionsToInsert)
+}
+
+function isCallArgumentsNode(node) {
+    return node.type === 'arguments'
+        && node.parent?.type === 'call_expression'
 }
 
 function isDotNode(node) {
@@ -26,13 +40,13 @@ function isDotNode(node) {
         && !(node.parent.parent?.type === 'assignment_expression' && node.parent.nextSibling?.type === '=')
 }
 
-function replaceDots(text, sortedDotIndexes) {
+function insertOptionalChaining(text, sortedPositions) {
     let sb = ''
     let from = 0
-    for (let dotIndex of sortedDotIndexes) {
-        sb += text.substring(from, dotIndex)
+    for (let position of sortedPositions) {
+        sb += text.substring(from, position.from)
         sb += '?.'
-        from = dotIndex + 1
+        from = position.to
     }
     sb += text.substring(from)
     return sb
