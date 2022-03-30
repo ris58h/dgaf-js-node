@@ -2,9 +2,15 @@
   "name": "dgaf-js",
   "version": "1.0.0",
   "description": "JS that DGAF",
-  "keywords": ["DGAF"],
+  "keywords": [
+    "DGAF"
+  ],
   "homepage": "https://github.com/ris58h/dgaf-js-node",
+  "license": "ISC",
   "author": "Ilya Rodionov",
+  "files": [
+    "/index.js"
+  ],
   "main": "index.js",
   "repository": {
     "type": "git",
