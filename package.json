@@ -2,9 +2,8 @@
   "name": "dgaf-js",
   "version": "1.0.0",
   "description": "JS that DGAF",
-  "type": "module",
   "scripts": {
-    "test": "mocha index.test.js"
+    "test": "mocha"
   },
   "dependencies": {
     "tree-sitter": "^0.20.0",
@@ -12,5 +11,6 @@
   },
   "devDependencies": {
     "mocha": "^9.2.2"
-  }
+  },
+  "type": "module"
 }

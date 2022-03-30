@@ -1,4 +1,4 @@
-import { transpileText } from './index.js';
+import { transpileText } from '../index.js';
 import { strict as assert } from 'assert';
 
 describe('transpileText', () => {

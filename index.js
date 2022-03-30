@@ -4,16 +4,16 @@ import JavaScript from 'tree-sitter-javascript'
 export function transpileText(text) {
     const parser = new Parser()
     parser.setLanguage(JavaScript)
-    
+
     const tree = parser.parse(text)
-    
+
     const dotIndexes = []
     walkTree(tree, node => {
         if (node.type === '.' && node?.parent.type === 'member_expression') {
             dotIndexes.push(node.startIndex)
         }
     })
-    
+
     dotIndexes.sort((a, b) => a - b)
 
     return replaceDots(text, dotIndexes)
