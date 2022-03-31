@@ -10,10 +10,16 @@ exports.transpile = function(text) {
 
     const positionsToInsert = []
     walkTree(tree, node => {
-        if (isDotNode(node)) {
+        if (isDotMemeberAccess(node)) {
             positionsToInsert.push({
                 from: node.startIndex,
                 to: node.endIndex
+            })
+        } else if (isBracketMemberAccess(node)) {
+            const bracketIndex = node.startIndex
+            positionsToInsert.push({
+                from: bracketIndex,
+                to: bracketIndex
             })
         } else if (isCallArgumentsNode(node)) {
             const argumentsIndex = node.startIndex
@@ -34,10 +40,20 @@ function isCallArgumentsNode(node) {
         && node.parent?.type === 'call_expression'
 }
 
-function isDotNode(node) {
+function isDotMemeberAccess(node) {
     return node.type === '.'
         && node.parent?.type === 'member_expression'
-        && !(node.parent.parent?.type === 'assignment_expression' && node.parent.nextSibling?.type === '=')
+        && !isLeftSideOfAssignment(node.parent)
+}
+
+function isBracketMemberAccess(node) {
+    return node.type === '['
+        && node.parent?.type === 'subscript_expression'
+        && !isLeftSideOfAssignment(node.parent)
+}
+
+function isLeftSideOfAssignment(node) {
+    return node.parent?.type === 'assignment_expression' && node.nextSibling?.type === '='
 }
 
 function insertOptionalChaining(text, sortedPositions) {
