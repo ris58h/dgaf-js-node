@@ -37,8 +37,8 @@ describe('transpile', () => {
         assert.equal(transpile('foo() = "bar"'), 'foo() = "bar"')
         assert.equal(transpile('foo()() = "bar"'), 'foo()() = "bar"')
     })
-    it('Multiple assignments', () => {
-        //TODO
+    it("Shouldn't replace  multiple assignments", () => {
+        assert.equal(transpile('foo = bar.baz = bar["baz"] = 777'), 'foo = bar.baz = bar["baz"] = 777')
     })
     it('Should preserve indentation', () => {
         const input = `if (foo.bar) {
