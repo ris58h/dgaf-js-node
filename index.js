@@ -2,15 +2,18 @@
 
 const transpile = require('./dgaf').transpile
 const fs = require("fs")
+const Module = require('module')
 
 if (process.argv.length === 5 && process.argv[2] === '-t' && process.argv[3] === '-c') {
-    transpileText(process.argv[4])
+    transpileAndPrint(process.argv[4])
 } else if (process.argv.length === 4 && process.argv[2] === '-t') {
-    readFile(process.argv[3], transpileText)
+    transpileAndPrint(fs.readFileSync(process.argv[3], 'utf8'))
 } else if (process.argv.length === 4 && process.argv[2] === '-c') {
-    interpretText(process.argv[3])
+    installJSExtension()
+    requireFromString(process.argv[3])
 } else if (process.argv.length === 3) {
-    readFile(process.argv[2], interpretText)
+    installJSExtension()
+    require(process.argv[2])
 } else if (process.argv.length === 2) {
     repl()
 } else {
@@ -21,21 +24,24 @@ function repl() {
     console.error("TODO repl")
 }
 
-function interpretText(text) {
-    console.error("TODO interpretText: " + text)
+function installJSExtension() {
+    Module._extensions['.js'] = (module, filename) => {
+        const content = fs.readFileSync(filename, 'utf8')
+        compile(module, filename, content)
+    }
 }
 
-function transpileText(text) {
-    const transpiledText = transpile(text)
-    console.log(transpiledText)
+function requireFromString(content) {
+    var module = new Module()
+    compile(module, '__dgaf-js-fake-path', content)
+    return module.exports
 }
 
-function readFile(path, callback) {
-    fs.readFile(path, 'utf8', (data, error) => {
-        if (error) {
-            console.error(error)
-            return
-        }
-        callback(data)
-    })
+function compile(module, filename, content) {
+    const transpiledContent = transpile(content)
+    module._compile(transpiledContent, filename)
+}
+
+function transpileAndPrint(code) {
+    console.log(transpile(code))
 }
