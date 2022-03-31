@@ -4,6 +4,8 @@ const assert = require('assert').strict
 describe('transpile', () => {
     it('Should replace simple reference access', () => {
         assert.equal(transpile('foo'), '(typeof foo === "undefined" ? void 0 : foo)')
+    })
+    it("Shouldn't replace simple reference access in the left side of assignment", () => {
         assert.equal(transpile('foo = bar'), 'foo = (typeof bar === "undefined" ? void 0 : bar)')
     })
     it('Should replace dot member access', () => {
@@ -25,9 +27,9 @@ describe('transpile', () => {
         assert.equal(transpile('foo["bar"]["baz"] = 777'), 'foo["bar"]["baz"] = 777')
     })
     it("Shouldn't replace other bracket expressions", () => {
-        assert.equal(transpile('var foo = []'), 'var foo = []')
-        assert.equal(transpile('var foo = ["bar"]'), 'var foo = ["bar"]')
-        // assert.equal(transpile('var foo = {[bar] = "baz"}'), 'var foo = {[bar] = "baz"}') //TODO 
+        assert.equal(transpile('foo = []'), 'foo = []')
+        assert.equal(transpile('foo = ["bar"]'), 'foo = ["bar"]')
+        // assert.equal(transpile('foo = {[bar] = "baz"}'), 'foo = {[bar] = "baz"}') //TODO 
     })
     it('Should replace function call', () => {
         assert.equal(transpile('foo()'), '(typeof foo === "undefined" ? void 0 : foo)?.()')
