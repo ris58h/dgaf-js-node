@@ -39,7 +39,10 @@ describe('transpile', () => {
         assert.equal(transpile('foo() = "bar"'), 'foo() = "bar"')
         assert.equal(transpile('foo()() = "bar"'), 'foo()() = "bar"')
     })
-    it("Shouldn't replace  multiple assignments", () => {
+    it("Should replace multiple access expressions", () => {
+        assert.equal(transpile('foo.bar.baz[777]()'), '(typeof foo === "undefined" ? void 0 : foo)?.bar?.baz?.[777]?.()')
+    })
+    it("Shouldn't replace multiple different assignments", () => {
         assert.equal(transpile('foo = bar.baz = bar["baz"] = 777'), 'foo = bar.baz = bar["baz"] = 777')
     })
     it('Should preserve indentation', () => {
