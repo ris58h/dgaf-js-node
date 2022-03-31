@@ -8,34 +8,46 @@ exports.transpile = function(text) {
     const tree = parser.parse(text)
     // printNode(tree.rootNode) //TODO
 
-    const positionsToInsert = []
+    const replacements = []
     walkTree(tree, node => {
-        if (isDotMemeberAccess(node)) {
-            positionsToInsert.push({
-                from: node.startIndex,
-                to: node.endIndex
-            })
-        } else if (isBracketMemberAccess(node)) {
-            const bracketIndex = node.startIndex
-            positionsToInsert.push({
-                from: bracketIndex,
-                to: bracketIndex
-            })
-        } else if (isCallArgumentsNode(node)) {
-            const argumentsIndex = node.startIndex
-            positionsToInsert.push({
-                from: argumentsIndex,
-                to: argumentsIndex
-            })
+        if (node.type === 'identifier') {
+            const accessIndentifier = !node.nextSibling
+                || isDotMemeberAccess(node.nextSibling)
+                || isBracketMemberAccess(node.nextSibling)
+                || isCallArguments(node.nextSibling)
+            if (accessIndentifier && isInAccessChain(node)) {
+                const identifier = node.text
+                const replaceWith = `(typeof ${identifier} === "undefined" ? void 0 : ${identifier})`
+                addReplacement(node.startIndex, node.endIndex, replaceWith)
+            }
+        } else if (isDotMemeberAccess(node) && !isInLeftSideOfAssignment(node.parent)) {
+            addReplacement(node.startIndex, node.endIndex, '?.')
+        } else if (isBracketMemberAccess(node) && !isInLeftSideOfAssignment(node.parent)) {
+            addReplacement(node.startIndex, node.startIndex, '?.')
+        } else if (isCallArguments(node)) {
+            addReplacement(node.startIndex, node.startIndex, '?.')
         }
     })
 
-    positionsToInsert.sort((a, b) => a.startIndex - b.startIndex)
+    replacements.sort((a, b) => a.from - b.from)
 
-    return insertOptionalChaining(text, positionsToInsert)
+    return replace(text, replacements)
+
+    function addReplacement(from, to, replaceWith) {
+        replacements.push({from, to, replaceWith})
+    }
 }
 
-function isCallArgumentsNode(node) {
+function isInAccessChain(node) {
+    while (['member_expression', 'subscript_expression', 'call_expression'].includes(node.parent?.type)) {
+        node = node.parent
+    }
+    const parentType = node.parent?.type
+    return parentType === 'expression_statement'
+        || (parentType === 'assignment_expression' && node.nextSibling?.type !== '=')
+}
+
+function isCallArguments(node) {
     return node.type === 'arguments'
         && node.parent?.type === 'call_expression'
 }
@@ -43,26 +55,30 @@ function isCallArgumentsNode(node) {
 function isDotMemeberAccess(node) {
     return node.type === '.'
         && node.parent?.type === 'member_expression'
-        && !isLeftSideOfAssignment(node.parent)
 }
 
 function isBracketMemberAccess(node) {
     return node.type === '['
         && node.parent?.type === 'subscript_expression'
-        && !isLeftSideOfAssignment(node.parent)
 }
 
-function isLeftSideOfAssignment(node) {
-    return node.parent?.type === 'assignment_expression' && node.nextSibling?.type === '='
+function isInLeftSideOfAssignment(node) {
+    while (node.parent) {
+        if (node.parent.type === 'assignment_expression') {
+            return node.nextSibling?.type === '='
+        }
+        node = node.parent
+    }
+    return false
 }
 
-function insertOptionalChaining(text, sortedPositions) {
+function replace(text, sortedReplacements) {
     let sb = ''
     let from = 0
-    for (let position of sortedPositions) {
-        sb += text.substring(from, position.from)
-        sb += '?.'
-        from = position.to
+    for (let replacement of sortedReplacements) {
+        sb += text.substring(from, replacement.from)
+        sb += replacement.replaceWith
+        from = replacement.to
     }
     sb += text.substring(from)
     return sb
