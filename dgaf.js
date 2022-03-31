@@ -24,7 +24,7 @@ exports.transpile = function(text) {
             addReplacement(node.startIndex, node.endIndex, '?.')
         } else if (isBracketMemberAccess(node) && !isInLeftSideOfAssignment(node.parent)) {
             addReplacement(node.startIndex, node.startIndex, '?.')
-        } else if (isCallArguments(node)) {
+        } else if (isCallArguments(node) && !isInErrorBranch(node)) {
             addReplacement(node.startIndex, node.startIndex, '?.')
         }
     })
@@ -66,6 +66,16 @@ function isInLeftSideOfAssignment(node) {
     while (node.parent) {
         if (node.parent.type === 'assignment_expression') {
             return node.nextSibling?.type === '='
+        }
+        node = node.parent
+    }
+    return false
+}
+
+function isInErrorBranch(node) {
+    while (node.parent) {
+        if (node.parent.hasError()) {
+            return true
         }
         node = node.parent
     }

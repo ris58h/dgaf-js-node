@@ -33,8 +33,9 @@ describe('transpile', () => {
         assert.equal(transpile('foo()'), '(typeof foo === "undefined" ? void 0 : foo)?.()')
         assert.equal(transpile('foo()()'), '(typeof foo === "undefined" ? void 0 : foo)?.()?.()')
     })
-    it("Function call in the left side of assignment", () => {
-        //TODO
+    it("Shouldn't replace function call in the left side of assignment (despite it's illegal)", () => {
+        assert.equal(transpile('foo() = "bar"'), 'foo() = "bar"')
+        assert.equal(transpile('foo()() = "bar"'), 'foo()() = "bar"')
     })
     it('Multiple assignments', () => {
         //TODO
