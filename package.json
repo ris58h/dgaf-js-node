@@ -14,7 +14,7 @@
   ],
   "main": "dgaf.js",
   "bin": {
-    "dgaf-js": "bin/transpile.js",
+    "dgaf-js": "bin/transpiler.js",
     "dgaf-js-node": "bin/node.js"
   },
   "repository": {
