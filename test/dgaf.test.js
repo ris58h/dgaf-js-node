@@ -62,4 +62,9 @@ describe('transpile', () => {
         assert.equal(transpile('if (foo.bar) 777'), 'if ((typeof foo === "undefined" ? void 0 : foo)?.bar) 777')
         assert.equal(transpile('if (foo().bar[baz]) 777'), 'if ((typeof foo === "undefined" ? void 0 : foo)?.()?.bar?.[baz]) 777')
     })
+    it('Should replace while expression', () => {
+        assert.equal(transpile('while (foo) 777'), 'while ((typeof foo === "undefined" ? void 0 : foo)) 777')
+        assert.equal(transpile('while (foo.bar) 777'), 'while ((typeof foo === "undefined" ? void 0 : foo)?.bar) 777')
+        assert.equal(transpile('while (foo().bar[baz]) 777'), 'while ((typeof foo === "undefined" ? void 0 : foo)?.()?.bar?.[baz]) 777')
+    })
 })
