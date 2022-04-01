@@ -16,6 +16,7 @@ exports.transpile = function(text) {
                 || isBracketMemberAccess(node.nextSibling)
                 || isCallArguments(node.nextSibling)
                 || isCallArgument(node)
+                || isInparentheses(node)
             if (accessIndentifier && isInAccessChain(node)) {
                 const identifier = node.text
                 const replaceWith = `(typeof ${identifier} === "undefined" ? void 0 : ${identifier})`
@@ -47,6 +48,7 @@ function isInAccessChain(node) {
     return parentType === 'expression_statement'
         || (parentType === 'assignment_expression' && node.nextSibling?.type !== '=')
         || parentType === 'arguments'
+        || parentType === 'parenthesized_expression'
 }
 
 function isCallArguments(node) {
@@ -56,6 +58,10 @@ function isCallArguments(node) {
 
 function isCallArgument(node) {
     return node.parent?.type === 'arguments'
+}
+
+function isInparentheses(node) {
+    return node.parent?.type === 'parenthesized_expression'
 }
 
 function isDotMemeberAccess(node) {
