@@ -15,6 +15,7 @@ if (process.argv.length === 4 && process.argv[2] === '-c') {
     requireFromString(fs.readFileSync(process.stdin.fd, 'utf8'))
 } else {
     console.error("Illegal arguments")
+    process.exit(1)
 }
 
 function installJSExtension() {
