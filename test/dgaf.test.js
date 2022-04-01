@@ -45,6 +45,18 @@ describe('transpile', () => {
     it("Shouldn't replace multiple different assignments", () => {
         assert.equal(transpile('foo = bar.baz = bar["baz"] = 777'), 'foo = bar.baz = bar["baz"] = 777')
     })
+    it.only('Should replace call arguments', () => {
+        assert.equal(transpile('foo(bar)'),
+            '(typeof foo === "undefined" ? void 0 : foo)?.((typeof bar === "undefined" ? void 0 : bar))')
+        assert.equal(transpile('foo(bar, baz)'),
+            '(typeof foo === "undefined" ? void 0 : foo)?.((typeof bar === "undefined" ? void 0 : bar), (typeof baz === "undefined" ? void 0 : baz))')
+        assert.equal(transpile('foo(777, bar.baz)'),
+            '(typeof foo === "undefined" ? void 0 : foo)?.(777, (typeof bar === "undefined" ? void 0 : bar)?.baz)')
+        assert.equal(transpile('foo(777, bar.baz, bar["baz"])'),
+            '(typeof foo === "undefined" ? void 0 : foo)?.(777, (typeof bar === "undefined" ? void 0 : bar)?.baz, (typeof bar === "undefined" ? void 0 : bar)?.["baz"])')
+            assert.equal(transpile('foo(777, bar(baz["foobar"]))'),
+            '(typeof foo === "undefined" ? void 0 : foo)?.(777, (typeof bar === "undefined" ? void 0 : bar)?.((typeof baz === "undefined" ? void 0 : baz)?.["foobar"]))')
+    })
     it('Should preserve indentation', () => {
         const input = `if (foo.bar) {
             console.log(foo.bar)
