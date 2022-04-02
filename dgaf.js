@@ -18,6 +18,7 @@ exports.transpile = function(text) {
                 || isCallArgument(node)
                 || isInparentheses(node)
                 || isUpdateArgument(node)
+                || isBinaryExpressionArgument(node)
             if (accessIndentifier && isInAccessChain(node)) {
                 const identifier = node.text
                 const replaceWith = `(typeof ${identifier} === "undefined" ? void 0 : ${identifier})`
@@ -57,6 +58,11 @@ function isInAccessChain(node) {
         || parentType === 'parenthesized_expression'
         || parentType === 'update_expression'
         || parentType === 'augmented_assignment_expression'
+        || parentType === 'binary_expression'
+}
+
+function isBinaryExpressionArgument(node) {
+    return node.isNamed && node.parent?.type === 'binary_expression'
 }
 
 function isLeftSideOfAugmentedAssignment(node) {
