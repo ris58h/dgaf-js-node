@@ -110,22 +110,22 @@ function walkTree(tree, callback) {
     const cursor = tree.walk()
     while (true) {
         callback(cursor.currentNode)
-        if (!goDown() && !goUp()) {
+        if (!goDown() && !gotoNextBranch()) {
             return
         }
     }
 
     function goDown() {
-        return cursor.gotoFirstChild() || cursor.gotoNextSibling()
+        return cursor.gotoFirstChild()
     }
 
-    function goUp() {
+    function gotoNextBranch() {
         while (true) {
-            if (!cursor.gotoParent()) {
-                return false
-            }
             if (cursor.gotoNextSibling()) {
                 return true
+            }
+            if (!cursor.gotoParent()) {
+                return false
             }
         }
     }
