@@ -22,6 +22,11 @@ exports.transpile = function(text) {
                 const identifier = node.text
                 const replaceWith = `(typeof ${identifier} === "undefined" ? void 0 : ${identifier})`
                 addReplacement(node.startIndex, node.endIndex, replaceWith)
+            } else if (isLeftSideOfAugmentedAssignment(node)) {
+                const identifier = node.text
+                const replaceWith = `if (typeof ${identifier} !== "undefined") {${identifier}`
+                addReplacement(node.startIndex, node.endIndex, replaceWith)
+                addReplacement(node.parent.endIndex, node.parent.endIndex, '}')
             }
         } else if (isDotMemeberAccess(node) && !isInLeftSideOfAssignment(node.parent)) {
             addReplacement(node.startIndex, node.endIndex, '?.')
@@ -51,6 +56,11 @@ function isInAccessChain(node) {
         || parentType === 'arguments'
         || parentType === 'parenthesized_expression'
         || parentType === 'update_expression'
+        || parentType === 'augmented_assignment_expression'
+}
+
+function isLeftSideOfAugmentedAssignment(node) {
+    return node.parent?.type === 'augmented_assignment_expression' && !node.previousSibling
 }
 
 function isUpdateArgument(node) {
@@ -83,7 +93,7 @@ function isBracketMemberAccess(node) {
 function isInLeftSideOfAssignment(node) {
     while (node.parent) {
         if (node.parent.type === 'assignment_expression') {
-            return node.nextSibling?.type === '='
+            return !node.previousSibling
         }
         node = node.parent
     }
