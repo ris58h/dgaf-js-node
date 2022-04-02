@@ -19,6 +19,7 @@ exports.transpile = function(text) {
                 || isInparentheses(node)
                 || isUpdateArgument(node)
                 || isBinaryExpressionArgument(node)
+                || isOptionalChaining(node.nextSibling)
             if (accessIndentifier && isInAccessChain(node)) {
                 const identifier = node.text
                 const replaceWith = `(typeof ${identifier} === "undefined" ? void 0 : ${identifier})`
@@ -31,9 +32,9 @@ exports.transpile = function(text) {
             }
         } else if (isDotMemeberAccess(node) && !isInLeftSideOfAssignment(node.parent)) {
             addReplacement(node.startIndex, node.endIndex, '?.')
-        } else if (isBracketMemberAccess(node) && !isInLeftSideOfAssignment(node.parent)) {
+        } else if (isBracketMemberAccess(node) && !isInLeftSideOfAssignment(node.parent) && !isOptionalAccess(node)) {
             addReplacement(node.startIndex, node.startIndex, '?.')
-        } else if (isCallArguments(node) && !isInErrorBranch(node)) {
+        } else if (isCallArguments(node) && !isInErrorBranch(node) && !isOptionalAccess(node)) {
             addReplacement(node.startIndex, node.startIndex, '?.')
         }
     })
@@ -47,8 +48,12 @@ exports.transpile = function(text) {
     }
 }
 
+function isAccessNode(node) {
+    return ['member_expression', 'subscript_expression', 'call_expression'].includes(node?.type)
+}
+
 function isInAccessChain(node) {
-    while (['member_expression', 'subscript_expression', 'call_expression'].includes(node.parent?.type)) {
+    while (isAccessNode(node.parent)) {
         node = node.parent
     }
     const parentType = node.parent?.type
@@ -89,6 +94,14 @@ function isInparentheses(node) {
 function isDotMemeberAccess(node) {
     return node.type === '.'
         && node.parent?.type === 'member_expression'
+}
+
+function isOptionalChaining(node) {
+    return node.type === '?.' && isAccessNode(node.parent)
+}
+
+function isOptionalAccess(node) {
+    return node.previousSibling && isOptionalChaining(node.previousSibling)
 }
 
 function isBracketMemberAccess(node) {

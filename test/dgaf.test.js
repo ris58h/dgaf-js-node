@@ -8,6 +8,17 @@ describe('transpile', () => {
     it("Shouldn't replace simple reference access in the left side of assignment", () => {
         assert.equal(transpile('foo = bar'), 'foo = (typeof bar === "undefined" ? void 0 : bar)')
     })
+    it("Optional chaining", () => {
+        assert.equal(transpile('foo?.bar'), '(typeof foo === "undefined" ? void 0 : foo)?.bar')
+        assert.equal(transpile('foo?.[bar]'), '(typeof foo === "undefined" ? void 0 : foo)?.[bar]')
+        assert.equal(transpile('foo?.()'), '(typeof foo === "undefined" ? void 0 : foo)?.()')
+        assert.equal(transpile('foo?.bar.baz'), '(typeof foo === "undefined" ? void 0 : foo)?.bar?.baz')
+        assert.equal(transpile('foo?.bar?.baz'), '(typeof foo === "undefined" ? void 0 : foo)?.bar?.baz')
+        assert.equal(transpile('foo?.bar[baz]'), '(typeof foo === "undefined" ? void 0 : foo)?.bar?.[baz]')
+        assert.equal(transpile('foo?.bar?.[baz]'), '(typeof foo === "undefined" ? void 0 : foo)?.bar?.[baz]')
+        assert.equal(transpile('foo?.bar()'), '(typeof foo === "undefined" ? void 0 : foo)?.bar?.()')
+        assert.equal(transpile('foo?.bar?.()'), '(typeof foo === "undefined" ? void 0 : foo)?.bar?.()')
+    })
     it('Should replace dot member access', () => {
         assert.equal(transpile('foo.bar'), '(typeof foo === "undefined" ? void 0 : foo)?.bar')
         assert.equal(transpile('foo.bar.baz'), '(typeof foo === "undefined" ? void 0 : foo)?.bar?.baz')
