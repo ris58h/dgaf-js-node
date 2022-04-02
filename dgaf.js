@@ -17,6 +17,7 @@ exports.transpile = function(text) {
                 || isCallArguments(node.nextSibling)
                 || isCallArgument(node)
                 || isInparentheses(node)
+                || isUpdateArgument(node)
             if (accessIndentifier && isInAccessChain(node)) {
                 const identifier = node.text
                 const replaceWith = `(typeof ${identifier} === "undefined" ? void 0 : ${identifier})`
@@ -49,6 +50,11 @@ function isInAccessChain(node) {
         || (parentType === 'assignment_expression' && node.nextSibling?.type !== '=')
         || parentType === 'arguments'
         || parentType === 'parenthesized_expression'
+        || parentType === 'update_expression'
+}
+
+function isUpdateArgument(node) {
+    return node.parent?.type === 'update_expression'
 }
 
 function isCallArguments(node) {

@@ -73,4 +73,17 @@ describe('transpile', () => {
         assert.equal(transpile('(foo.bar)'), '((typeof foo === "undefined" ? void 0 : foo)?.bar)')
         assert.equal(transpile('(foo().bar[baz])'), '((typeof foo === "undefined" ? void 0 : foo)?.()?.bar?.[baz])')
     })
+    it.only('Should replace increment/decrement', () => {
+        assert.equal(transpile('foo++'), '(typeof foo === "undefined" ? void 0 : foo)++')
+        assert.equal(transpile('foo.bar++'), '(typeof foo === "undefined" ? void 0 : foo)?.bar++')
+
+        assert.equal(transpile('++foo'), '++(typeof foo === "undefined" ? void 0 : foo)')
+        assert.equal(transpile('++foo.bar'), '++(typeof foo === "undefined" ? void 0 : foo)?.bar')
+
+        assert.equal(transpile('foo--'), '(typeof foo === "undefined" ? void 0 : foo)--')
+        assert.equal(transpile('foo.bar--'), '(typeof foo === "undefined" ? void 0 : foo)?.bar--')
+
+        assert.equal(transpile('--foo'), '--(typeof foo === "undefined" ? void 0 : foo)')
+        assert.equal(transpile('--foo.bar'), '--(typeof foo === "undefined" ? void 0 : foo)?.bar')
+    })
 })
