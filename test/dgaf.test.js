@@ -162,6 +162,10 @@ describe('transpile', () => {
         assert.equal(transpile('(foo) => bar'), '(foo) => (typeof bar === "undefined" ? void 0 : bar)')
         assert.equal(transpile('(foo) => bar.baz'), '(foo) => (typeof bar === "undefined" ? void 0 : bar)?.baz')
     })
+    it('Should replace assignment pattern', () => {
+        assert.equal(transpile('(foo = bar) => bar'), '(foo = (typeof bar === "undefined" ? void 0 : bar)) => (typeof bar === "undefined" ? void 0 : bar)')
+        assert.equal(transpile('(foo = bar.baz) => bar.baz'), '(foo = (typeof bar === "undefined" ? void 0 : bar)?.baz) => (typeof bar === "undefined" ? void 0 : bar)?.baz')
+    })
     describe("Shouldn't check for undefined reference if reference is already in scope", () => {
         it('when indentifier is function parameter', () => {
             assert.equal(transpile('function foo(bar){\nreturn bar\n}'), 'function foo(bar){\nreturn bar\n}')

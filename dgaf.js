@@ -109,6 +109,11 @@ function isReferencePlace(node) {
         || isPairRightSide(node)
         || isReturnValue(node)
         || isArrowFunctionBody(node)
+        || isRightSideOfAssignmentPattern(node)
+}
+
+function isRightSideOfAssignmentPattern(node) {
+    return node.parent?.type === 'assignment_pattern' && node.nextSibling?.type !== '='
 }
 
 function isFunctionBody(node) {
