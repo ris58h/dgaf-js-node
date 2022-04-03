@@ -65,6 +65,7 @@ function isInAccessChain(node) {
         || parentType === 'update_expression'
         || parentType === 'augmented_assignment_expression'
         || parentType === 'binary_expression'
+        || (parentType === 'variable_declarator' && node.previousSibling?.type === '=')
 }
 
 function isBinaryExpressionArgument(node) {

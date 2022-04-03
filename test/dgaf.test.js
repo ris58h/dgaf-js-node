@@ -109,8 +109,22 @@ describe('transpile', () => {
         assert.equal(transpile('foo >>= bar'), 'if (typeof foo !== "undefined") {foo >>= (typeof bar === "undefined" ? void 0 : bar)}')
         assert.equal(transpile('foo >>= bar.baz[777]'), 'if (typeof foo !== "undefined") {foo >>= (typeof bar === "undefined" ? void 0 : bar)?.baz?.[777]}')
     })
-    it('Should replace euqal expression', () => {
+    it('Should replace equal expression', () => {
         assert.equal(transpile('foo == bar'), '(typeof foo === "undefined" ? void 0 : foo) == (typeof bar === "undefined" ? void 0 : bar)')
         assert.equal(transpile('foo.baz == bar.baz'), '(typeof foo === "undefined" ? void 0 : foo)?.baz == (typeof bar === "undefined" ? void 0 : bar)?.baz')
+    })
+    it('Should replace declaration', () => {
+        assert.equal(transpile('var foo = bar'), 'var foo = (typeof bar === "undefined" ? void 0 : bar)')
+        assert.equal(transpile('let foo = bar'), 'let foo = (typeof bar === "undefined" ? void 0 : bar)')
+        assert.equal(transpile('const foo = bar'), 'const foo = (typeof bar === "undefined" ? void 0 : bar)')
+
+        assert.equal(transpile('var foo = bar.baz'), 'var foo = (typeof bar === "undefined" ? void 0 : bar)?.baz')
+        assert.equal(transpile('let foo = bar.baz'), 'let foo = (typeof bar === "undefined" ? void 0 : bar)?.baz')
+        assert.equal(transpile('const foo = bar.baz'), 'const foo = (typeof bar === "undefined" ? void 0 : bar)?.baz')
+    })
+    it("Shouldn't replace declaration without assignment", () => {
+        assert.equal(transpile('var foo'), 'var foo')
+        assert.equal(transpile('let foo'), 'let foo')
+        assert.equal(transpile('const foo'), 'const foo')
     })
 })
