@@ -139,4 +139,8 @@ describe('transpile', () => {
         assert.equal(transpile('for(foo of bar){}'), 'for(foo of (typeof bar === "undefined" ? void 0 : bar)){}')
         assert.equal(transpile('for(foo of bar.baz){}'), 'for(foo of (typeof bar === "undefined" ? void 0 : bar)?.baz){}')
     })
+    it('Should replace array elements', () => {
+        assert.equal(transpile('[foo]'), '[(typeof foo === "undefined" ? void 0 : foo)]')
+        assert.equal(transpile('[foo, bar.baz.foobar]'), '[(typeof foo === "undefined" ? void 0 : foo), (typeof bar === "undefined" ? void 0 : bar)?.baz?.foobar]')
+    })
 })

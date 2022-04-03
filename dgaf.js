@@ -22,6 +22,7 @@ exports.transpile = function(text) {
                 || isBinaryExpressionArgument(node)
                 || isOptionalChaining(node.nextSibling)
                 || isForEnumerable(node)
+                || isArrayElement(node)
             if (accessIndentifier && isInAccessChain(node)) {
                 const identifier = node.text
                 const replaceWith = `(typeof ${identifier} === "undefined" ? void 0 : ${identifier})`
@@ -68,6 +69,11 @@ function isInAccessChain(node) {
         || parentType === 'binary_expression'
         || (parentType === 'variable_declarator' && node.previousSibling?.type === '=')
         || isForEnumerable(node)
+        || parentType === 'array'
+}
+
+function isArrayElement(node) {
+    return node.parent?.type === 'array' && node.isNamed
 }
 
 function isForEnumerable(node) {
