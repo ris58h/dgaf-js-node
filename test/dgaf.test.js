@@ -200,6 +200,13 @@ describe('transpile', () => {
             assert.equal(transpile('const foo = {}; foo'), 'const foo = {}; foo')
             assert.equal(transpile('const foo = {}; foo.bar'), 'const foo = {}; foo?.bar')
             assert.equal(transpile('const foo = {}; foo.bar.baz'), 'const foo = {}; foo?.bar?.baz')
+
+            assert.equal(transpile('var foo = {}\nfoo.bar()\nvar baz = foo.baz()'),
+                'var foo = {}\nfoo?.bar?.()\nvar baz = foo?.baz?.()')
+            assert.equal(transpile('let foo = {}\nfoo.bar()\nlet baz = foo.baz()'),
+                'let foo = {}\nfoo?.bar?.()\nlet baz = foo?.baz?.()')
+            assert.equal(transpile('const foo = {}\nfoo.bar()\nconst baz = foo.baz()'),
+                'const foo = {}\nfoo?.bar?.()\nconst baz = foo?.baz?.()')
         })
     })
 })

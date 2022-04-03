@@ -63,7 +63,7 @@ function processNode(node, replacements) {
                 if (identifierInParameters(current.previousSibling)) return true
             } else if (isArrowFunctionBody(current)) {
                 if (identifierInParameters(current.previousSibling.previousSibling)) return true
-            } else if (current.type === 'expression_statement') {
+            } else if (current.type === 'expression_statement' || current.type === 'variable_declaration' || current.type === 'lexical_declaration') {
                 if (hasDeclarationOnTheSameLevel(current)) return true
             }
 
