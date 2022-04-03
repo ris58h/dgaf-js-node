@@ -17,7 +17,7 @@ exports.transpile = function(text) {
                 || isBracketMemberAccess(node.nextSibling)
                 || isCallArguments(node.nextSibling)
                 || isCallArgument(node)
-                || isInparentheses(node)
+                || isInParentheses(node)
                 || isUpdateArgument(node)
                 || isBinaryExpressionArgument(node)
                 || isOptionalChaining(node.nextSibling)
@@ -62,15 +62,15 @@ function isInAccessChain(node) {
     }
     const parentType = node.parent?.type
     return parentType === 'expression_statement'
-        || (parentType === 'assignment_expression' && node.nextSibling?.type !== '=')
-        || parentType === 'arguments'
-        || parentType === 'parenthesized_expression'
-        || parentType === 'update_expression'
-        || parentType === 'augmented_assignment_expression'
-        || parentType === 'binary_expression'
-        || (parentType === 'variable_declarator' && node.previousSibling?.type === '=')
+        || isRightSideOfAssignment(node)
+        || isCallArgument(node)
+        || isInParentheses(node)
+        || isUpdateArgument(node)
+        || isRightSideOfAugmentedAssignment(node)
+        || isBinaryExpressionArgument(node)
+        || isRightSideOfVariableDeclaration(node)
         || isForEnumerable(node)
-        || parentType === 'array'
+        || isArrayElement(node)
         || isPairRightSide(node)
 }
 
@@ -87,12 +87,20 @@ function isForEnumerable(node) {
         && (node.previousSibling?.type === 'in' || node.previousSibling?.type === 'of')
 }
 
+function isRightSideOfVariableDeclaration(node) {
+    return node.parent?.type === 'variable_declarator' && node.previousSibling?.type === '='
+}
+
 function isBinaryExpressionArgument(node) {
     return node.isNamed && node.parent?.type === 'binary_expression'
 }
 
 function isLeftSideOfAugmentedAssignment(node) {
     return node.parent?.type === 'augmented_assignment_expression' && !node.previousSibling
+}
+
+function isRightSideOfAugmentedAssignment(node) {
+    return node.parent?.type === 'augmented_assignment_expression' && node.previousSibling && !node.previousSibling.isNamed
 }
 
 function isUpdateArgument(node) {
@@ -108,7 +116,7 @@ function isCallArgument(node) {
     return node.parent?.type === 'arguments'
 }
 
-function isInparentheses(node) {
+function isInParentheses(node) {
     return node.parent?.type === 'parenthesized_expression'
 }
 
@@ -138,6 +146,10 @@ function isInLeftSideOfAssignment(node) {
         node = node.parent
     }
     return false
+}
+
+function isRightSideOfAssignment(node) {
+    return node.parent?.type === 'assignment_expression' && node.nextSibling?.type !== '='
 }
 
 function isInErrorBranch(node) {
