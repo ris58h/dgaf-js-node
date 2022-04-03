@@ -148,4 +148,8 @@ describe('transpile', () => {
         assert.equal(transpile('{}'), '{}')
         assert.equal(transpile('{foo: 1}'), '{foo: 1}')
     })
+    it("Should replace return value", () => {
+        assert.equal(transpile('function foo(){\nreturn bar\n}'), 'function foo(){\nreturn (typeof bar === "undefined" ? void 0 : bar)\n}')
+        assert.equal(transpile('function foo(){\nreturn bar.baz\n}'), 'function foo(){\nreturn (typeof bar === "undefined" ? void 0 : bar)?.baz\n}')
+    })
 })

@@ -78,6 +78,11 @@ function isReferencePlace(node) {
         || isForEnumerable(node)
         || isArrayElement(node)
         || isPairRightSide(node)
+        || isReturnValue(node)
+}
+
+function isReturnValue(node) {
+    return node.parent?.type === 'return_statement' && node.previousSibling?.type === 'return'
 }
 
 function isPairRightSide(node) {
