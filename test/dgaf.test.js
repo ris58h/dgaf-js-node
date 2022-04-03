@@ -39,11 +39,6 @@ describe('transpile', () => {
         assert.equal(transpile('foo["bar"] = baz["bar"]'), 'foo["bar"] = (typeof baz === "undefined" ? void 0 : baz)?.["bar"]')
         assert.equal(transpile('foo["bar"]["baz"] = 777'), 'foo["bar"]["baz"] = 777')
     })
-    it("Shouldn't replace other bracket expressions", () => {
-        assert.equal(transpile('foo = []'), 'foo = []')
-        assert.equal(transpile('foo = ["bar"]'), 'foo = ["bar"]')
-        // assert.equal(transpile('foo = {[bar] = "baz"}'), 'foo = {[bar] = "baz"}') //TODO 
-    })
     it('Should replace function call', () => {
         assert.equal(transpile('foo()'), '(typeof foo === "undefined" ? void 0 : foo)?.()')
         assert.equal(transpile('foo()()'), '(typeof foo === "undefined" ? void 0 : foo)?.()?.()')
@@ -142,9 +137,15 @@ describe('transpile', () => {
     it('Should replace array elements', () => {
         assert.equal(transpile('[foo]'), '[(typeof foo === "undefined" ? void 0 : foo)]')
         assert.equal(transpile('[foo, bar.baz.foobar]'), '[(typeof foo === "undefined" ? void 0 : foo), (typeof bar === "undefined" ? void 0 : bar)?.baz?.foobar]')
+
+        assert.equal(transpile('[]'), '[]')
+        assert.equal(transpile('[1, "2"]'), '[1, "2"]')
     })
     it('Should replace object creation', () => {
         assert.equal(transpile('{foo: bar}'), '{foo: (typeof bar === "undefined" ? void 0 : bar)}')
         assert.equal(transpile('{foo: bar.baz}'), '{foo: (typeof bar === "undefined" ? void 0 : bar)?.baz}')
+
+        assert.equal(transpile('{}'), '{}')
+        assert.equal(transpile('{foo: 1}'), '{foo: 1}')
     })
 })
