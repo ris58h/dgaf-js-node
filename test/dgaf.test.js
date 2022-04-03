@@ -155,5 +155,11 @@ describe('transpile', () => {
     it('Should replace arrow function body', () => {
         assert.equal(transpile('() => bar'), '() => (typeof bar === "undefined" ? void 0 : bar)')
         assert.equal(transpile('() => bar.baz'), '() => (typeof bar === "undefined" ? void 0 : bar)?.baz')
+
+        assert.equal(transpile('foo => bar'), 'foo => (typeof bar === "undefined" ? void 0 : bar)')
+        assert.equal(transpile('foo => bar.baz'), 'foo => (typeof bar === "undefined" ? void 0 : bar)?.baz')
+
+        assert.equal(transpile('(foo) => bar'), '(foo) => (typeof bar === "undefined" ? void 0 : bar)')
+        assert.equal(transpile('(foo) => bar.baz'), '(foo) => (typeof bar === "undefined" ? void 0 : bar)?.baz')
     })
 })
