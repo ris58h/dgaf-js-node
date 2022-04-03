@@ -109,9 +109,13 @@ describe('transpile', () => {
         assert.equal(transpile('foo >>= bar'), 'if (typeof foo !== "undefined") {foo >>= (typeof bar === "undefined" ? void 0 : bar)}')
         assert.equal(transpile('foo >>= bar.baz[777]'), 'if (typeof foo !== "undefined") {foo >>= (typeof bar === "undefined" ? void 0 : bar)?.baz?.[777]}')
     })
-    it('Should replace equal expression', () => {
+    it('Should replace binary expression', () => {
         assert.equal(transpile('foo == bar'), '(typeof foo === "undefined" ? void 0 : foo) == (typeof bar === "undefined" ? void 0 : bar)')
         assert.equal(transpile('foo.baz == bar.baz'), '(typeof foo === "undefined" ? void 0 : foo)?.baz == (typeof bar === "undefined" ? void 0 : bar)?.baz')
+
+        assert.equal(transpile('foo + bar'), '(typeof foo === "undefined" ? void 0 : foo) + (typeof bar === "undefined" ? void 0 : bar)')
+        assert.equal(transpile('foobar = foo + bar'), 'foobar = (typeof foo === "undefined" ? void 0 : foo) + (typeof bar === "undefined" ? void 0 : bar)')
+        assert.equal(transpile('foobaz = foo + bar.baz'), 'foobaz = (typeof foo === "undefined" ? void 0 : foo) + (typeof bar === "undefined" ? void 0 : bar)?.baz')
     })
     it('Should replace declaration', () => {
         assert.equal(transpile('var foo = bar'), 'var foo = (typeof bar === "undefined" ? void 0 : bar)')
