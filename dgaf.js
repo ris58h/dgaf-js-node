@@ -79,6 +79,11 @@ function isReferencePlace(node) {
         || isArrayElement(node)
         || isPairRightSide(node)
         || isReturnValue(node)
+        || isArrowFunctionBody(node)
+}
+
+function isArrowFunctionBody(node) {
+    return node.parent?.type === 'arrow_function' && node.previousSibling?.type === '=>'
 }
 
 function isReturnValue(node) {
