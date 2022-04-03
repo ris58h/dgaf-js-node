@@ -161,6 +161,13 @@ describe('transpile', () => {
 
         assert.equal(transpile('(foo) => bar'), '(foo) => (typeof bar === "undefined" ? void 0 : bar)')
         assert.equal(transpile('(foo) => bar.baz'), '(foo) => (typeof bar === "undefined" ? void 0 : bar)?.baz')
+
+        assert.equal(transpile('foobar(() => bar())'),
+            '(typeof foobar === "undefined" ? void 0 : foobar)?.(() => (typeof bar === "undefined" ? void 0 : bar)?.())')
+        assert.equal(transpile('foobar(foo => bar())'),
+            '(typeof foobar === "undefined" ? void 0 : foobar)?.(foo => (typeof bar === "undefined" ? void 0 : bar)?.())')
+        assert.equal(transpile('foobar((foo) => bar())'),
+            '(typeof foobar === "undefined" ? void 0 : foobar)?.((foo) => (typeof bar === "undefined" ? void 0 : bar)?.())')
     })
     it('Should replace assignment pattern', () => {
         assert.equal(transpile('(foo = bar) => bar'), '(foo = (typeof bar === "undefined" ? void 0 : bar)) => (typeof bar === "undefined" ? void 0 : bar)')

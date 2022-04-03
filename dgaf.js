@@ -17,15 +17,12 @@ exports.transpile = function(text) {
 function processNode(node, replacements) {
     if (isReference(node) && isReferencePlace(node)) {
         processReferenceNode(node)
-        return false
     } else if (isLeftSideOfAugmentedAssignment(node)) {
         const identifier = node.text
         const replaceWith = `if (typeof ${identifier} !== "undefined") {${identifier}`
         addReplacement(node.startIndex, node.endIndex, replaceWith)
         addReplacement(node.parent.endIndex, node.parent.endIndex, '}')
     }
-
-    return true
 
     function processReferenceNode(node) {
         if (node.type === 'identifier') {
@@ -48,9 +45,6 @@ function processNode(node, replacements) {
             const secondChild = node.child(1)
             if (secondChild.type === 'arguments') {
                 addReplacement(secondChild.startIndex, secondChild.startIndex, '?.')
-                for (const argument of secondChild.namedChildren) {
-                    processReferenceNode(argument)
-                }
             }
             processReferenceNode(node.child(0))
         }
@@ -204,8 +198,8 @@ function replace(text, sortedReplacements) {
 function walkTree(tree, callback) {
     const cursor = tree.walk()
     while (true) {
-        const skipSubtree = !callback(cursor.currentNode)
-        if (!skipSubtree && goDown()) {
+        callback(cursor.currentNode)
+        if (goDown()) {
             continue
         }
         if (!gotoNextBranch()) {
