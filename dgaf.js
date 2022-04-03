@@ -30,8 +30,10 @@ function processNode(node, replacements) {
     function processReferenceNode(node) {
         if (node.type === 'identifier') {
             const identifier = node.text
-            const replaceWith = `(typeof ${identifier} === "undefined" ? void 0 : ${identifier})`
-            addReplacement(node.startIndex, node.endIndex, replaceWith)
+            if (!isAlreadyInScope(identifier)) {
+                const replaceWith = `(typeof ${identifier} === "undefined" ? void 0 : ${identifier})`
+                addReplacement(node.startIndex, node.endIndex, replaceWith)
+            }
         } else if (node.type === 'member_expression') {
             const dotNode = node.child(1)
             addReplacement(dotNode.startIndex, dotNode.endIndex, '?.')
@@ -51,6 +53,33 @@ function processNode(node, replacements) {
                 }
             }
             processReferenceNode(node.child(0))
+        }
+    }
+
+    function isAlreadyInScope(identifier) {
+        let current = node
+        while (current.parent) {
+            let parameters
+            if (isFunctionBody(current)) {
+                parameters = current.previousSibling
+            } else if (isArrowFunctionBody(current)) {
+                parameters = current.previousSibling.previousSibling
+            }
+            if (parameters) {
+                if (isIdentifier(parameters)) {
+                    return true
+                } else if (parameters.type === 'formal_parameters') {
+                    for (const parameter of parameters.namedChildren) {
+                        if (isIdentifier(parameter)) return true
+                    }
+                }
+            }
+            current = current.parent
+        }
+        return false
+
+        function isIdentifier(node) {
+            return node.type === 'identifier' && node.text === identifier
         }
     }
 
@@ -80,6 +109,10 @@ function isReferencePlace(node) {
         || isPairRightSide(node)
         || isReturnValue(node)
         || isArrowFunctionBody(node)
+}
+
+function isFunctionBody(node) {
+    return node.type === 'statement_block' && node.parent?.firstChild.type === 'function'
 }
 
 function isArrowFunctionBody(node) {
@@ -176,21 +209,20 @@ function walkTree(tree, callback) {
 }
 
 //TODO
-// function printNode(node, lvl = 0) {
-//     const prefix = '-'.repeat(lvl)
-//     console.log(prefix + describeNode(node))
-//     if (node.children) {
-//         for (let childNode of node.children) {
-//             printNode(childNode, lvl + 1)
-//         }
-//     }
-
-//     function describeNode(node) {
-//         var sb = ''
-//         if (node.hasError()) sb += 'E~'
-//         if (node.isMissing()) sb += 'M~'
-//         sb += node.type
-//         if (node.isNamed) sb += ': ' + node.text
-//         return sb
-//     }
-// }
+function printNode(node, lvl = 0) {
+    const prefix = '-'.repeat(lvl)
+    console.log(prefix + describeNode(node))
+    if (node.children) {
+        for (let childNode of node.children) {
+            printNode(childNode, lvl + 1)
+        }
+    }
+}
+function describeNode(node) {
+    var sb = ''
+    if (node.hasError()) sb += 'E~'
+    if (node.isMissing()) sb += 'M~'
+    sb += node.type
+    if (node.isNamed) sb += ': ' + node.text
+    return sb
+}
