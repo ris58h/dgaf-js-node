@@ -12,6 +12,7 @@ exports.transpile = function(text) {
     walkTree(tree, node => {
         if (node.type === 'identifier') {
             const accessIndentifier = !node.nextSibling
+                || node.nextSibling.type === ';'
                 || isDotMemeberAccess(node.nextSibling)
                 || isBracketMemberAccess(node.nextSibling)
                 || isCallArguments(node.nextSibling)

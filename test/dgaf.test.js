@@ -4,9 +4,11 @@ const assert = require('assert').strict
 describe('transpile', () => {
     it('Should replace simple reference access', () => {
         assert.equal(transpile('foo'), '(typeof foo === "undefined" ? void 0 : foo)')
+        assert.equal(transpile('foo;'), '(typeof foo === "undefined" ? void 0 : foo);')
     })
     it("Shouldn't replace simple reference access in the left side of assignment", () => {
         assert.equal(transpile('foo = bar'), 'foo = (typeof bar === "undefined" ? void 0 : bar)')
+        assert.equal(transpile('foo = bar;'), 'foo = (typeof bar === "undefined" ? void 0 : bar);')
     })
     it("Optional chaining", () => {
         assert.equal(transpile('foo?.bar'), '(typeof foo === "undefined" ? void 0 : foo)?.bar')
