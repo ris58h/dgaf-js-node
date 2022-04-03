@@ -1,4 +1,4 @@
-const transpile = require('../dgaf').transpile
+const transpile = require('..').transpile
 const assert = require('assert').strict
 
 describe('transpile', () => {
