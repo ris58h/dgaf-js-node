@@ -208,12 +208,15 @@ describe('transpile', () => {
             assert.equal(transpile('const foo = {}; foo.bar'), 'const foo = {}; foo?.bar')
             assert.equal(transpile('const foo = {}; foo.bar.baz'), 'const foo = {}; foo?.bar?.baz')
 
-            assert.equal(transpile('var foo = {}\nfoo.bar()\nvar baz = foo.baz()'),
-                'var foo = {}\nfoo?.bar?.()\nvar baz = foo?.baz?.()')
-            assert.equal(transpile('let foo = {}\nfoo.bar()\nlet baz = foo.baz()'),
-                'let foo = {}\nfoo?.bar?.()\nlet baz = foo?.baz?.()')
-            assert.equal(transpile('const foo = {}\nfoo.bar()\nconst baz = foo.baz()'),
-                'const foo = {}\nfoo?.bar?.()\nconst baz = foo?.baz?.()')
+            assert.equal(transpile('foo = {}\nbaz = foo.baz()'), 'foo = {}\nbaz = foo?.baz?.()')
+            assert.equal(transpile('var foo = {}\nvar baz = foo.baz()'), 'var foo = {}\nvar baz = foo?.baz?.()')
+            assert.equal(transpile('let foo = {}\nlet baz = foo.baz()'), 'let foo = {}\nlet baz = foo?.baz?.()')
+            assert.equal(transpile('const foo = {}\nconst baz = foo.baz()'), 'const foo = {}\nconst baz = foo?.baz?.()')
+
+            assert.equal(transpile('foo = {}\nreturn foo.bar()'), 'foo = {}\nreturn foo?.bar?.()')
+            assert.equal(transpile('var foo = {}\nreturn foo.bar()'), 'var foo = {}\nreturn foo?.bar?.()')
+            assert.equal(transpile('let foo = {}\nreturn foo.bar()'), 'let foo = {}\nreturn foo?.bar?.()')
+            assert.equal(transpile('const foo = {}\nreturn foo.bar()'), 'const foo = {}\nreturn foo?.bar?.()')
         })
         it('when indentifier is function', () => {
             assert.equal(transpile('function foo(){}; foo()'), 'function foo(){}; foo?.()')
