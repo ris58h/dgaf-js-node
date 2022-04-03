@@ -21,6 +21,7 @@ exports.transpile = function(text) {
                 || isUpdateArgument(node)
                 || isBinaryExpressionArgument(node)
                 || isOptionalChaining(node.nextSibling)
+                || isForEnumerable(node)
             if (accessIndentifier && isInAccessChain(node)) {
                 const identifier = node.text
                 const replaceWith = `(typeof ${identifier} === "undefined" ? void 0 : ${identifier})`
@@ -66,6 +67,12 @@ function isInAccessChain(node) {
         || parentType === 'augmented_assignment_expression'
         || parentType === 'binary_expression'
         || (parentType === 'variable_declarator' && node.previousSibling?.type === '=')
+        || isForEnumerable(node)
+}
+
+function isForEnumerable(node) {
+    return node.parent?.type === 'for_in_statement'
+        && (node.previousSibling?.type === 'in' || node.previousSibling?.type === 'of')
 }
 
 function isBinaryExpressionArgument(node) {

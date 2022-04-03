@@ -131,4 +131,12 @@ describe('transpile', () => {
         //TODO [a.b] = c
         //TODO { x: a?.b } = c
     })
+    it('Should replace for enumerable', () => {
+        assert.equal(transpile('for(foo in bar){}'), 'for(foo in (typeof bar === "undefined" ? void 0 : bar)){}')
+        assert.equal(transpile('for(foo in bar.baz){}'), 'for(foo in (typeof bar === "undefined" ? void 0 : bar)?.baz){}')
+    })
+    it('Should replace for iterable', () => {
+        assert.equal(transpile('for(foo of bar){}'), 'for(foo of (typeof bar === "undefined" ? void 0 : bar)){}')
+        assert.equal(transpile('for(foo of bar.baz){}'), 'for(foo of (typeof bar === "undefined" ? void 0 : bar)?.baz){}')
+    })
 })
