@@ -23,6 +23,7 @@ exports.transpile = function(text) {
                 || isOptionalChaining(node.nextSibling)
                 || isForEnumerable(node)
                 || isArrayElement(node)
+                || isPairRightSide(node)
             if (accessIndentifier && isInAccessChain(node)) {
                 const identifier = node.text
                 const replaceWith = `(typeof ${identifier} === "undefined" ? void 0 : ${identifier})`
@@ -70,6 +71,11 @@ function isInAccessChain(node) {
         || (parentType === 'variable_declarator' && node.previousSibling?.type === '=')
         || isForEnumerable(node)
         || parentType === 'array'
+        || isPairRightSide(node)
+}
+
+function isPairRightSide(node) {
+    return node.parent?.type === 'pair' && node.previousSibling?.type === ':'
 }
 
 function isArrayElement(node) {

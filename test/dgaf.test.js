@@ -143,4 +143,8 @@ describe('transpile', () => {
         assert.equal(transpile('[foo]'), '[(typeof foo === "undefined" ? void 0 : foo)]')
         assert.equal(transpile('[foo, bar.baz.foobar]'), '[(typeof foo === "undefined" ? void 0 : foo), (typeof bar === "undefined" ? void 0 : bar)?.baz?.foobar]')
     })
+    it('Should replace object creation', () => {
+        assert.equal(transpile('{foo: bar}'), '{foo: (typeof bar === "undefined" ? void 0 : bar)}')
+        assert.equal(transpile('{foo: bar.baz}'), '{foo: (typeof bar === "undefined" ? void 0 : bar)?.baz}')
+    })
 })
