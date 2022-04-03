@@ -62,7 +62,7 @@ describe('transpile', () => {
             '(typeof foo === "undefined" ? void 0 : foo)?.(777, (typeof bar === "undefined" ? void 0 : bar)?.baz)')
         assert.equal(transpile('foo(777, bar.baz, bar["baz"])'),
             '(typeof foo === "undefined" ? void 0 : foo)?.(777, (typeof bar === "undefined" ? void 0 : bar)?.baz, (typeof bar === "undefined" ? void 0 : bar)?.["baz"])')
-            assert.equal(transpile('foo(777, bar(baz["foobar"]))'),
+        assert.equal(transpile('foo(777, bar(baz["foobar"]))'),
             '(typeof foo === "undefined" ? void 0 : foo)?.(777, (typeof bar === "undefined" ? void 0 : bar)?.((typeof baz === "undefined" ? void 0 : baz)?.["foobar"]))')
     })
     it('Should replace if expression', () => {
@@ -183,6 +183,23 @@ describe('transpile', () => {
             assert.equal(transpile('foo = (bar) => {bar}'), 'foo = (bar) => {bar}')
             assert.equal(transpile('foo = (bar = baz) => {bar.baz}'), 'foo = (bar = (typeof baz === "undefined" ? void 0 : baz)) => {bar?.baz}')
             assert.equal(transpile('foo = (bar = baz.foo) => {bar.baz}'), 'foo = (bar = (typeof baz === "undefined" ? void 0 : baz)?.foo) => {bar?.baz}')
+        })
+        it('when identifier is variable', () => {
+            assert.equal(transpile('foo = {}; foo'), 'foo = {}; foo')
+            assert.equal(transpile('foo = {}; foo.bar'), 'foo = {}; foo?.bar')
+            assert.equal(transpile('foo = {}; foo.bar.baz'), 'foo = {}; foo?.bar?.baz')
+
+            assert.equal(transpile('var foo = {}; foo'), 'var foo = {}; foo')
+            assert.equal(transpile('var foo = {}; foo.bar'), 'var foo = {}; foo?.bar')
+            assert.equal(transpile('var foo = {}; foo.bar.baz'), 'var foo = {}; foo?.bar?.baz')
+
+            assert.equal(transpile('let foo = {}; foo'), 'let foo = {}; foo')
+            assert.equal(transpile('let foo = {}; foo.bar'), 'let foo = {}; foo?.bar')
+            assert.equal(transpile('let foo = {}; foo.bar.baz'), 'let foo = {}; foo?.bar?.baz')
+
+            assert.equal(transpile('const foo = {}; foo'), 'const foo = {}; foo')
+            assert.equal(transpile('const foo = {}; foo.bar'), 'const foo = {}; foo?.bar')
+            assert.equal(transpile('const foo = {}; foo.bar.baz'), 'const foo = {}; foo?.bar?.baz')
         })
     })
 })

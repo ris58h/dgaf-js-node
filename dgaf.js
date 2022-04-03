@@ -59,28 +59,43 @@ function processNode(node, replacements) {
     function isAlreadyInScope(identifier) {
         let current = node
         while (current.parent) {
-            let parameters
             if (isFunctionBody(current)) {
-                parameters = current.previousSibling
+                if (identifierInParameters(current.previousSibling)) return true
             } else if (isArrowFunctionBody(current)) {
-                parameters = current.previousSibling.previousSibling
+                if (identifierInParameters(current.previousSibling.previousSibling)) return true
+            } else if (current.type === 'expression_statement') {
+                if (hasDeclarationOnTheSameLevel(current)) return true
             }
+
+            current = current.parent
+        }
+
+        function hasDeclarationOnTheSameLevel(node) {
+            while (node.previousSibling) {
+                node = node.previousSibling
+                if (node.type === 'expression_statement') {
+                    if (node.firstChild?.type === 'assignment_expression' && isDesiredIdentifier(node.firstChild.firstChild)) return true
+                } else if (node.type === 'variable_declaration' || node.type === 'lexical_declaration') {
+                    if (node.firstNamedChild?.type === 'variable_declarator' && isDesiredIdentifier(node.firstNamedChild.firstChild)) return true
+                }
+            }
+        }
+
+        function identifierInParameters(parameters) {
             if (parameters) {
-                if (isIdentifier(parameters)) {
+                if (isDesiredIdentifier(parameters)) {
                     return true
                 } else if (parameters.type === 'formal_parameters') {
                     for (const parameter of parameters.namedChildren) {
-                        if (isIdentifier(parameter)) return true
-                        if (parameter.type === 'assignment_pattern' && isIdentifier(parameter.firstChild)) return true
+                        if (isDesiredIdentifier(parameter)) return true
+                        if (parameter.type === 'assignment_pattern' && isDesiredIdentifier(parameter.firstChild)) return true
                     }
                 }
             }
-            current = current.parent
         }
-        return false
 
-        function isIdentifier(node) {
-            return node.type === 'identifier' && node.text === identifier
+        function isDesiredIdentifier(node) {
+            return node && node.type === 'identifier' && node.text === identifier
         }
     }
 
