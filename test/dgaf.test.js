@@ -174,7 +174,7 @@ describe('transpile', () => {
         assert.equal(transpile('(foo = bar.baz) => bar.baz'), '(foo = (typeof bar === "undefined" ? void 0 : bar)?.baz) => (typeof bar === "undefined" ? void 0 : bar)?.baz')
     })
     describe("Shouldn't check for undefined reference if reference is already in scope", () => {
-        it('when indentifier is function parameter', () => {
+        it('when identifier is function parameter', () => {
             assert.equal(transpile('function foo(bar){\nreturn bar\n}'), 'function foo(bar){\nreturn bar\n}')
             assert.equal(transpile('function foo(bar){\nreturn bar.baz\n}'), 'function foo(bar){\nreturn bar?.baz\n}')
 
@@ -221,15 +221,15 @@ describe('transpile', () => {
             assert.equal(transpile('foo = {}\nwhile(foo.bar){foo.bar()}'), 'foo = {}\nwhile(foo?.bar){foo?.bar?.()}')
             assert.equal(transpile('foo = {}\nif(foo.bar){foo.bar()}'), 'foo = {}\nif(foo?.bar){foo?.bar?.()}')
         })
-        it('when indentifier is function', () => {
+        it('when identifier is function', () => {
             assert.equal(transpile('function foo(){}; foo()'), 'function foo(){}; foo?.()')
             assert.equal(transpile('foo(); function foo(){}'), 'foo?.(); function foo(){}')
 
             assert.equal(transpile('function foo(){return bar()}; function bar(){}'), 'function foo(){return bar?.()}; function bar(){}')
 
-            //TODO assert.equal(transpile('function foo(){return foo()}'), 'function foo(){return foo?.()}')
+            assert.equal(transpile('function foo(){return foo()}'), 'function foo(){return foo?.()}')
         })
-        it('when indentifier is for element', () => {
+        it('when identifier is for element', () => {
             assert.equal(transpile('for(var foo in {}){foo()}'), 'for(var foo in {}){foo?.()}')
             assert.equal(transpile('for(let foo in {}){foo()}'), 'for(let foo in {}){foo?.()}')
             assert.equal(transpile('for(const foo in {}){foo()}'), 'for(const foo in {}){foo?.()}')

@@ -79,12 +79,12 @@ function processNode(node, replacements) {
                 }
             }
             current = node
-            while (current.nextSibling) {
-                current = current.nextSibling
+            do {
                 if (current.type === 'function_declaration') {
                     if (isDesiredIdentifier(current.firstNamedChild)) return true
                 }
-            }
+                current = current.nextSibling
+            } while (current)
         }
 
         function identifierInParameters(parameters) {
