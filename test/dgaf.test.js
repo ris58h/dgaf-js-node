@@ -127,4 +127,8 @@ describe('transpile', () => {
         assert.equal(transpile('let foo'), 'let foo')
         assert.equal(transpile('const foo'), 'const foo')
     })
+    it.skip("Should replace destructuring assignment", () => {
+        //TODO [a.b] = c
+        //TODO { x: a?.b } = c
+    })
 })
