@@ -246,5 +246,15 @@ describe('transpile', () => {
             assert.equal(transpile('for(let foo of []) foo()'), 'for(let foo of []) foo?.()')
             assert.equal(transpile('for(const foo of []) foo()'), 'for(const foo of []) foo?.()')
         })
+        it('when it is left side of augmented assignment', () => {
+            assert.equal(transpile('foo = "";foo += bar'), 'foo = "";foo += (typeof bar === "undefined" ? void 0 : bar)')
+            assert.equal(transpile('var foo = "";foo += bar'), 'var foo = "";foo += (typeof bar === "undefined" ? void 0 : bar)')
+            assert.equal(transpile('let foo = "";foo += bar'), 'let foo = "";foo += (typeof bar === "undefined" ? void 0 : bar)')
+            
+            assert.equal(transpile('for (var foo in {}) foo += bar'), 'for (var foo in {}) foo += (typeof bar === "undefined" ? void 0 : bar)')
+            assert.equal(transpile('for (let foo in {}) foo += bar'), 'for (let foo in {}) foo += (typeof bar === "undefined" ? void 0 : bar)')
+            assert.equal(transpile('for (var foo of []) foo += bar'), 'for (var foo of []) foo += (typeof bar === "undefined" ? void 0 : bar)')
+            assert.equal(transpile('for (let foo of []) foo += bar'), 'for (let foo of []) foo += (typeof bar === "undefined" ? void 0 : bar)')
+        })
     })
 })

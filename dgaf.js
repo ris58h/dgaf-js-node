@@ -19,9 +19,11 @@ function processNode(node, replacements) {
         processReferenceNode(node)
     } else if (isLeftSideOfAugmentedAssignment(node)) {
         const identifier = node.text
-        const replaceWith = `if (typeof ${identifier} !== "undefined") {${identifier}`
-        addReplacement(node.startIndex, node.endIndex, replaceWith)
-        addReplacement(node.parent.endIndex, node.parent.endIndex, '}')
+        if (!isAlreadyInScope(identifier)) {
+            const replaceWith = `if (typeof ${identifier} !== "undefined") {${identifier}`
+            addReplacement(node.startIndex, node.endIndex, replaceWith)
+            addReplacement(node.parent.endIndex, node.parent.endIndex, '}')
+        }
     }
 
     function processReferenceNode(node) {
