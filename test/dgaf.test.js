@@ -131,10 +131,6 @@ describe('transpile', () => {
         assert.equal(transpile('let foo'), 'let foo')
         assert.equal(transpile('const foo'), 'const foo')
     })
-    it.skip("Should replace destructuring assignment", () => {
-        //TODO [a.b] = c
-        //TODO { x: a?.b } = c
-    })
     it('Should replace for enumerable', () => {
         assert.equal(transpile('for(foo in bar){}'), 'for(foo in (typeof bar === "undefined" ? void 0 : bar)){}')
         assert.equal(transpile('for(foo in bar.baz){}'), 'for(foo in (typeof bar === "undefined" ? void 0 : bar)?.baz){}')
