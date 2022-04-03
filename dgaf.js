@@ -57,6 +57,8 @@ function processNode(node, replacements) {
                 if (identifierInParameters(current.previousSibling)) return true
             } else if (isArrowFunctionBody(current)) {
                 if (identifierInParameters(current.previousSibling.previousSibling)) return true
+            } else if (isForBody(current)) {
+                if (isDesiredIdentifier(current.parent.firstNamedChild)) return true
             } else if (hasDeclarationOnTheSameLevel(current)) {
                 return true
             }
@@ -134,6 +136,10 @@ function isReferencePlace(node) {
 
 function isRightSideOfAssignmentPattern(node) {
     return node.parent?.type === 'assignment_pattern' && node.nextSibling?.type !== '='
+}
+
+function isForBody(node) {
+    return node.parent?.type === 'for_in_statement' && node.previousSibling?.type === ')'
 }
 
 function isFunctionBody(node) {

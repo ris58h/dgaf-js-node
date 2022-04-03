@@ -229,5 +229,22 @@ describe('transpile', () => {
 
             //TODO assert.equal(transpile('function foo(){return foo()}'), 'function foo(){return foo?.()}')
         })
+        it('when indentifier is for element', () => {
+            assert.equal(transpile('for(var foo in {}){foo()}'), 'for(var foo in {}){foo?.()}')
+            assert.equal(transpile('for(let foo in {}){foo()}'), 'for(let foo in {}){foo?.()}')
+            assert.equal(transpile('for(const foo in {}){foo()}'), 'for(const foo in {}){foo?.()}')
+
+            assert.equal(transpile('for(var foo of []){foo()}'), 'for(var foo of []){foo?.()}')
+            assert.equal(transpile('for(let foo of []){foo()}'), 'for(let foo of []){foo?.()}')
+            assert.equal(transpile('for(const foo of []){foo()}'), 'for(const foo of []){foo?.()}')
+
+            assert.equal(transpile('for(var foo in {}) foo()'), 'for(var foo in {}) foo?.()')
+            assert.equal(transpile('for(let foo in {}) foo()'), 'for(let foo in {}) foo?.()')
+            assert.equal(transpile('for(const foo in {}) foo()'), 'for(const foo in {}) foo?.()')
+
+            assert.equal(transpile('for(var foo of []) foo()'), 'for(var foo of []) foo?.()')
+            assert.equal(transpile('for(let foo of []) foo()'), 'for(let foo of []) foo?.()')
+            assert.equal(transpile('for(const foo of []) foo()'), 'for(const foo of []) foo?.()')
+        })
     })
 })
