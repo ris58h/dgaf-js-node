@@ -215,5 +215,9 @@ describe('transpile', () => {
             assert.equal(transpile('const foo = {}\nfoo.bar()\nconst baz = foo.baz()'),
                 'const foo = {}\nfoo?.bar?.()\nconst baz = foo?.baz?.()')
         })
+        it('when indentifier is function', () => {
+            assert.equal(transpile('function foo(){}; foo()'), 'function foo(){}; foo?.()')
+            assert.equal(transpile('foo(); function foo(){}'), 'foo?.(); function foo(){}')
+        })
     })
 })

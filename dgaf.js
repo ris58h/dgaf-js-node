@@ -65,12 +65,22 @@ function processNode(node, replacements) {
         }
 
         function hasDeclarationOnTheSameLevel(node) {
-            while (node.previousSibling) {
-                node = node.previousSibling
-                if (node.type === 'expression_statement') {
-                    if (node.firstChild?.type === 'assignment_expression' && isDesiredIdentifier(node.firstChild.firstChild)) return true
-                } else if (node.type === 'variable_declaration' || node.type === 'lexical_declaration') {
-                    if (node.firstNamedChild?.type === 'variable_declarator' && isDesiredIdentifier(node.firstNamedChild.firstChild)) return true
+            let current = node
+            while (current.previousSibling) {
+                current = current.previousSibling
+                if (current.type === 'expression_statement') {
+                    if (current.firstChild?.type === 'assignment_expression' && isDesiredIdentifier(current.firstChild.firstChild)) return true
+                } else if (current.type === 'variable_declaration' || current.type === 'lexical_declaration') {
+                    if (current.firstNamedChild?.type === 'variable_declarator' && isDesiredIdentifier(current.firstNamedChild.firstChild)) return true
+                } else if (current.type === 'function_declaration') {
+                    if (isDesiredIdentifier(current.firstNamedChild)) return true
+                }
+            }
+            current = node
+            while (current.nextSibling) {
+                current = current.nextSibling
+                if (current.type === 'function_declaration') {
+                    if (isDesiredIdentifier(current.firstNamedChild)) return true
                 }
             }
         }
