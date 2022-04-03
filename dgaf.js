@@ -57,8 +57,8 @@ function processNode(node, replacements) {
                 if (identifierInParameters(current.previousSibling)) return true
             } else if (isArrowFunctionBody(current)) {
                 if (identifierInParameters(current.previousSibling.previousSibling)) return true
-            } else if (['expression_statement', 'variable_declaration', 'lexical_declaration', 'return_statement'].includes(current.type)) {
-                if (hasDeclarationOnTheSameLevel(current)) return true
+            } else if (hasDeclarationOnTheSameLevel(current)) {
+                return true
             }
 
             current = current.parent
@@ -244,7 +244,7 @@ function printNode(node, lvl = 0) {
     }
 }
 function describeNode(node) {
-    var sb = ''
+    let sb = ''
     if (node.hasError()) sb += 'E~'
     if (node.isMissing()) sb += 'M~'
     sb += node.type

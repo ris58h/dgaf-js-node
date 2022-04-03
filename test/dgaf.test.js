@@ -217,10 +217,17 @@ describe('transpile', () => {
             assert.equal(transpile('var foo = {}\nreturn foo.bar()'), 'var foo = {}\nreturn foo?.bar?.()')
             assert.equal(transpile('let foo = {}\nreturn foo.bar()'), 'let foo = {}\nreturn foo?.bar?.()')
             assert.equal(transpile('const foo = {}\nreturn foo.bar()'), 'const foo = {}\nreturn foo?.bar?.()')
+
+            assert.equal(transpile('foo = {}\nwhile(foo.bar){foo.bar()}'), 'foo = {}\nwhile(foo?.bar){foo?.bar?.()}')
+            assert.equal(transpile('foo = {}\nif(foo.bar){foo.bar()}'), 'foo = {}\nif(foo?.bar){foo?.bar?.()}')
         })
         it('when indentifier is function', () => {
             assert.equal(transpile('function foo(){}; foo()'), 'function foo(){}; foo?.()')
             assert.equal(transpile('foo(); function foo(){}'), 'foo?.(); function foo(){}')
+
+            assert.equal(transpile('function foo(){return bar()}; function bar(){}'), 'function foo(){return bar?.()}; function bar(){}')
+
+            //TODO assert.equal(transpile('function foo(){return foo()}'), 'function foo(){return foo?.()}')
         })
     })
 })
