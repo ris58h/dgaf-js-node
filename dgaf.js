@@ -71,6 +71,7 @@ function processNode(node, replacements) {
                 } else if (parameters.type === 'formal_parameters') {
                     for (const parameter of parameters.namedChildren) {
                         if (isIdentifier(parameter)) return true
+                        if (parameter.type === 'assignment_pattern' && isIdentifier(parameter.firstChild)) return true
                     }
                 }
             }

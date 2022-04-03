@@ -179,6 +179,10 @@ describe('transpile', () => {
 
             assert.equal(transpile('foo = (bar) => {bar}'), 'foo = (bar) => {bar}')
             assert.equal(transpile('foo = (bar) => {bar.baz}'), 'foo = (bar) => {bar?.baz}')
+
+            assert.equal(transpile('foo = (bar) => {bar}'), 'foo = (bar) => {bar}')
+            assert.equal(transpile('foo = (bar = baz) => {bar.baz}'), 'foo = (bar = (typeof baz === "undefined" ? void 0 : baz)) => {bar?.baz}')
+            assert.equal(transpile('foo = (bar = baz.foo) => {bar.baz}'), 'foo = (bar = (typeof baz === "undefined" ? void 0 : baz)?.foo) => {bar?.baz}')
         })
     })
 })
