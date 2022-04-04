@@ -16,7 +16,7 @@ exports.transpile = function(text) {
 
 function processNode(node, replacements) {
     if (isReference(node) && isReferencePlace(node)) {
-        processReferenceNode(node)
+        processReferenceNode(node, node)
     } else if (isLeftSideOfAugmentedAssignment(node)) {
         const identifier = node.text
         if (!isAlreadyInScope(identifier)) {
@@ -26,29 +26,34 @@ function processNode(node, replacements) {
         }
     }
 
-    function processReferenceNode(node) {
+    function processReferenceNode(node, context) {
         if (node.type === 'identifier') {
             const identifier = node.text
             if (!isAlreadyInScope(identifier)) {
-                const replaceWith = `(typeof ${identifier} === "undefined" ? void 0 : ${identifier})`
+                let replaceWith = `(typeof ${identifier} === "undefined" ? void 0 : ${identifier})`
+                if (!context.previousSibling
+                    && context.parent.type === 'expression_statement'
+                    && context.parent.previousSibling.type === 'expression_statement') {
+                    replaceWith = ';' + replaceWith
+                }
                 addReplacement(node.startIndex, node.endIndex, replaceWith)
             }
         } else if (node.type === 'member_expression') {
             const dotNode = node.child(1)
             addReplacement(dotNode.startIndex, dotNode.endIndex, '?.')
-            processReferenceNode(node.child(0))
+            processReferenceNode(node.child(0), context)
         } else if (node.type === 'subscript_expression') {
             const secondChild = node.child(1)
             if (secondChild.type === '[') {
                 addReplacement(secondChild.startIndex, secondChild.startIndex, '?.')
             }
-            processReferenceNode(node.child(0))
+            processReferenceNode(node.child(0), context)
         } else if (node.type === 'call_expression') {
             const secondChild = node.child(1)
             if (secondChild.type === 'arguments') {
                 addReplacement(secondChild.startIndex, secondChild.startIndex, '?.')
             }
-            processReferenceNode(node.child(0))
+            processReferenceNode(node.child(0), context)
         }
     }
 

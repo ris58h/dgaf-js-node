@@ -257,4 +257,8 @@ describe('transpile', () => {
             assert.equal(transpile('for (let foo of []) foo += bar'), 'for (let foo of []) foo += (typeof bar === "undefined" ? void 0 : bar)')
         })
     })
+    it('Should insert ";" if check for undefined is next to expression', () => {
+        assert.equal(transpile('42\nfoo'), '42\n;(typeof foo === "undefined" ? void 0 : foo)')
+        assert.equal(transpile('42\nfoo.bar'), '42\n;(typeof foo === "undefined" ? void 0 : foo)?.bar')
+    })
 })
