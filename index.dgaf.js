@@ -31,9 +31,7 @@ function processNode(node, replacements) {
             const identifier = node.text
             if (!isAlreadyInScope(identifier)) {
                 let replaceWith = `(typeof ${identifier} === "undefined" ? void 0 : ${identifier})`
-                if (!context.previousSibling
-                    && context.parent.type === 'expression_statement'
-                    && context.parent.previousSibling.type === 'expression_statement') {
+                if (isBeginningOfNewLineWithoutSemicolon(context)) {
                     replaceWith = ';' + replaceWith
                 }
                 addReplacement(node.startIndex, node.endIndex, replaceWith)
@@ -114,6 +112,14 @@ function processNode(node, replacements) {
 
     function addReplacement(from, to, replaceWith) {
         replacements.push({from, to, replaceWith})
+    }
+
+    function isBeginningOfNewLineWithoutSemicolon(context) {
+        const isNewLine = context.parent.type === 'expression_statement' && context.parent.previousSibling
+            && context.parent.previousSibling.endPosition.row !== context.startPosition.row
+        return isNewLine 
+            && !context.parent.previousSibling.text.endsWith(';')
+            && !context.text.startsWith(';')
     }
 }
 

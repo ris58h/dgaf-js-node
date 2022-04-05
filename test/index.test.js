@@ -257,8 +257,22 @@ describe('transpile', () => {
             assert.equal(transpile('for (let foo of []) foo += bar'), 'for (let foo of []) foo += (typeof bar === "undefined" ? void 0 : bar)')
         })
     })
-    it('Should insert ";" if check for undefined is next to expression', () => {
+    it("Should insert ';' if it's not before undefined check", () => {
         assert.equal(transpile('42\nfoo'), '42\n;(typeof foo === "undefined" ? void 0 : foo)')
         assert.equal(transpile('42\nfoo.bar'), '42\n;(typeof foo === "undefined" ? void 0 : foo)?.bar')
+
+        assert.equal(transpile('baz = 42\nfoo'), 'baz = 42\n;(typeof foo === "undefined" ? void 0 : foo)')
+        assert.equal(transpile('baz = 42\nfoo.bar'), 'baz = 42\n;(typeof foo === "undefined" ? void 0 : foo)?.bar')
+
+        assert.equal(transpile('var baz = 42\nfoo'), 'var baz = 42\n;(typeof foo === "undefined" ? void 0 : foo)')
+        assert.equal(transpile('var baz = 42\nfoo.bar'), 'var baz = 42\n;(typeof foo === "undefined" ? void 0 : foo)?.bar')
+
+        assert.equal(transpile('let baz = 42\nfoo'), 'let baz = 42\n;(typeof foo === "undefined" ? void 0 : foo)')
+        assert.equal(transpile('let baz = 42\nfoo.bar'), 'let baz = 42\n;(typeof foo === "undefined" ? void 0 : foo)?.bar')
+
+        assert.equal(transpile('const baz = 42\nfoo'), 'const baz = 42\n;(typeof foo === "undefined" ? void 0 : foo)')
+        assert.equal(transpile('const baz = 42\nfoo.bar'), 'const baz = 42\n;(typeof foo === "undefined" ? void 0 : foo)?.bar')
+        assert.equal(transpile('const baz = 42\n;foo'), 'const baz = 42\n;(typeof foo === "undefined" ? void 0 : foo)')
+        assert.equal(transpile('const baz = 42\n;foo.bar'), 'const baz = 42\n;(typeof foo === "undefined" ? void 0 : foo)?.bar')
     })
 })
