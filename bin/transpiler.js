@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const transpile = require('../dgaf').transpile
+const transpile = require('..').transpile
 const fs = require("fs")
 
 if (process.argv.length === 4 && process.argv[2] === '-c') {
