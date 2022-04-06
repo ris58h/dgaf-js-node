@@ -145,6 +145,11 @@ function isReferencePlace(node) {
         || isReturnValue(node)
         || isArrowFunctionBody(node)
         || isRightSideOfAssignmentPattern(node)
+        || isYieldBody(node)
+}
+
+function isYieldBody(node) {
+    return node.parent.type === 'yield_expression' && node.isNamed
 }
 
 function isRightSideOfAssignmentPattern(node) {

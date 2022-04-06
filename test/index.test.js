@@ -275,4 +275,8 @@ describe('transpile', () => {
         assert.equal(transpile('const baz = 42\n;foo'), 'const baz = 42\n;(typeof foo === "undefined" ? void 0 : foo)')
         assert.equal(transpile('const baz = 42\n;foo.bar'), 'const baz = 42\n;(typeof foo === "undefined" ? void 0 : foo)?.bar')
     })
+    it('Should replace yield value', () => {
+        assert.equal(transpile('function* foo(){yield bar}'), 'function* foo(){yield (typeof bar === "undefined" ? void 0 : bar)}')
+        assert.equal(transpile('function* foo(){yield bar.baz}'), 'function* foo(){yield (typeof bar === "undefined" ? void 0 : bar)?.baz}')
+    })
 })
