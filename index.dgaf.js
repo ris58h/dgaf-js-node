@@ -76,9 +76,9 @@ function processNode(node, replacements) {
             while (current.previousSibling) {
                 current = current.previousSibling
                 if (current.type === 'expression_statement') {
-                    if (current.firstChild?.type === 'assignment_expression' && isDesiredIdentifier(current.firstChild.firstChild)) return true
+                    if (current.firstChild.type === 'assignment_expression' && isDesiredIdentifier(current.firstChild.firstChild)) return true
                 } else if (current.type === 'variable_declaration' || current.type === 'lexical_declaration') {
-                    if (current.firstNamedChild?.type === 'variable_declarator' && isDesiredIdentifier(current.firstNamedChild.firstChild)) return true
+                    if (current.firstNamedChild.type === 'variable_declarator' && isDesiredIdentifier(current.firstNamedChild.firstChild)) return true
                 } else if (current.type === 'function_declaration') {
                     if (isDesiredIdentifier(current.firstNamedChild)) return true
                 }
@@ -131,7 +131,7 @@ function isReference(node) {
 }
 
 function isReferencePlace(node) {
-    return node.parent?.type === 'expression_statement'
+    return node.parent.type === 'expression_statement'
         || isRightSideOfAssignment(node)
         || isCallArgument(node)
         || isInParentheses(node)
@@ -148,68 +148,68 @@ function isReferencePlace(node) {
 }
 
 function isRightSideOfAssignmentPattern(node) {
-    return node.parent?.type === 'assignment_pattern' && node.nextSibling?.type !== '='
+    return node.parent.type === 'assignment_pattern' && node.nextSibling.type !== '='
 }
 
 function isForBody(node) {
-    return node.parent?.type === 'for_in_statement' && node.previousSibling?.type === ')'
+    return node.parent.type === 'for_in_statement' && node.previousSibling.type === ')'
 }
 
 function isFunctionBody(node) {
-    return node.type === 'statement_block' && node.parent?.firstChild.type === 'function'
+    return node.type === 'statement_block' && node.parent.firstChild.type === 'function'
 }
 
 function isArrowFunctionBody(node) {
-    return node.parent?.type === 'arrow_function' && node.previousSibling?.type === '=>'
+    return node.parent.type === 'arrow_function' && node.previousSibling.type === '=>'
 }
 
 function isReturnValue(node) {
-    return node.parent?.type === 'return_statement' && node.previousSibling?.type === 'return'
+    return node.parent.type === 'return_statement' && node.previousSibling.type === 'return'
 }
 
 function isPairRightSide(node) {
-    return node.parent?.type === 'pair' && node.previousSibling?.type === ':'
+    return node.parent.type === 'pair' && node.previousSibling.type === ':'
 }
 
 function isArrayElement(node) {
-    return node.parent?.type === 'array' && node.isNamed
+    return node.parent.type === 'array' && node.isNamed
 }
 
 function isForEnumerable(node) {
-    return node.parent?.type === 'for_in_statement'
-        && (node.previousSibling?.type === 'in' || node.previousSibling?.type === 'of')
+    return node.parent.type === 'for_in_statement'
+        && (node.previousSibling.type === 'in' || node.previousSibling.type === 'of')
 }
 
 function isRightSideOfVariableDeclaration(node) {
-    return node.parent?.type === 'variable_declarator' && node.previousSibling?.type === '='
+    return node.parent.type === 'variable_declarator' && node.previousSibling.type === '='
 }
 
 function isBinaryExpressionArgument(node) {
-    return node.isNamed && node.parent?.type === 'binary_expression'
+    return node.isNamed && node.parent.type === 'binary_expression'
 }
 
 function isLeftSideOfAugmentedAssignment(node) {
-    return node.parent?.type === 'augmented_assignment_expression' && !node.previousSibling
+    return node.parent.type === 'augmented_assignment_expression' && !node.previousSibling
 }
 
 function isRightSideOfAugmentedAssignment(node) {
-    return node.parent?.type === 'augmented_assignment_expression' && node.previousSibling && !node.previousSibling.isNamed
+    return node.parent.type === 'augmented_assignment_expression' && node.previousSibling && !node.previousSibling.isNamed
 }
 
 function isUpdateArgument(node) {
-    return node.parent?.type === 'update_expression'
+    return node.parent.type === 'update_expression'
 }
 
 function isCallArgument(node) {
-    return node.parent?.type === 'arguments'
+    return node.parent.type === 'arguments'
 }
 
 function isInParentheses(node) {
-    return node.parent?.type === 'parenthesized_expression'
+    return node.parent.type === 'parenthesized_expression'
 }
 
 function isRightSideOfAssignment(node) {
-    return node.parent?.type === 'assignment_expression' && node.nextSibling?.type !== '='
+    return node.parent.type === 'assignment_expression' && node.nextSibling.type !== '='
 }
 
 function replace(text, sortedReplacements) {
