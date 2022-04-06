@@ -8,7 +8,7 @@ exports.transpile = function(text) {
     // printNode(tree.rootNode) //TODO
 
     const replacements = []
-    walkTree(tree, node => processNode(node, replacements))
+    walkTree(tree, node => {if (node.isNamed) processNode(node, replacements)})
     replacements.sort((a, b) => a.from - b.from)
 
     return replace(text, replacements)
